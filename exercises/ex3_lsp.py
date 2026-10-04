@@ -52,23 +52,22 @@ class SteadyCar(Vehicle):
 
 
 class UnreliableCar(Vehicle):
-    """VIOLATION (on purpose): sometimes this 'car' rolls backward or
-    blows up mid-race, breaking every caller that assumed a Vehicle only
-    ever moves forward and never raises. Fix move() below.
+    """Unreliable, but it still honors the Vehicle contract.
+
+    Its unreliability is modeled as something the contract ALLOWS:
+    some ticks it simply does not advance (position stays exactly the
+    same). It never raises and never moves backwards, so Track (or any
+    other caller) can use it exactly like any other Vehicle.
     """
 
     symbol = "\U0001F699"
 
     def move(self) -> None:
-        # TODO(LSP): rewrite this so it never raises and never decreases
-        # `self.position`. "Unreliable" can still mean something (e.g.
-        # occasionally staying in place) -- it just can't break the
-        # Vehicle contract.
         roll = random.random()
         if roll < 0.15:
-            raise RuntimeError(f"{self.name} broke down!")
+            return  # broke down: stays in place instead of raising
         elif roll < 0.30:
-            self.position -= 3  # ran out of gas and rolled back downhill
+            return  # ran out of gas: stays in place instead of rolling back
         else:
             self.position += 5
 
